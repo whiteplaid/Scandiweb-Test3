@@ -1,22 +1,21 @@
 <?PHP
 
-    namespace Scandiweb\Test\Setup\Patch\Data;
+namespace Scandiweb\Test\Setup\Patch\Data;
 
-    use Magento\Catalog\Model\ProductFactory as ProductInterfaceFactory;
-    use Magento\Catalog\Api\ProductRepositoryInterface;
-    use Magento\Catalog\Model\Product;
-    use Magento\Catalog\Model\Product\Attribute\Source\Status;
-    use Magento\Catalog\Model\Product\Type;
-    use Magento\Catalog\Model\Product\Visibility;
-    use Magento\Eav\Setup\EavSetup;
-    use Magento\Store\Model\StoreManagerInterface;
-    use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
-    use Magento\InventoryApi\Api\Data\SourceItemInterface;
-    use Magento\InventoryApi\Api\SourceItemsSaveInterface;
-    use Magento\Framework\Setup\Patch\DataPatchInterface;
-    use Magento\Framework\App\State;
-    use Magento\Catalog\Model\ResourceModel\Category\Collection\Factory as CategoryCollectionFactory;
-    use Magento\Catalog\Api\CategoryLinkManagementInterface;
+use Magento\Catalog\Api\CategoryLinkManagementInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ProductFactory as ProductInterfaceFactory;
+use Magento\Eav\Setup\EavSetup;
+use Magento\Framework\App\State;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\InventoryApi\Api\Data\SourceItemInterface;
+use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
+use Magento\InventoryApi\Api\SourceItemsSaveInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Create Migration product class
@@ -72,27 +71,36 @@ class CreateGripTrainerProduct implements DataPatchInterface
      * @param SourceItemsSaveInterface $sourceItemsSaveInterface
      * @param State $appState
      * @param StoreManagerInterface $storeManager
-	 * @param EavSetup $eavSetup
+     * @param EavSetup $eavSetup
      * @param CategoryLinkManagementInterface $categoryLink
      */
     public function __construct(
-        ProductInterfaceFactory $productInterfaceFactory,
-        ProductRepositoryInterface $productRepository,
-        State $appState,
-        StoreManagerInterface $storeManager,
-        EavSetup $eavSetup,
-		SourceItemInterfaceFactory $sourceItemFactory,
-        SourceItemsSaveInterface $sourceItemsSaveInterface,
-		CategoryLinkManagementInterface $categoryLink
-    ) {
+        ProductInterfaceFactory         $productInterfaceFactory,
+        ProductRepositoryInterface      $productRepository,
+        State                           $appState,
+        StoreManagerInterface           $storeManager,
+        EavSetup                        $eavSetup,
+        SourceItemInterfaceFactory      $sourceItemFactory,
+        SourceItemsSaveInterface        $sourceItemsSaveInterface,
+        CategoryLinkManagementInterface $categoryLink
+    )
+    {
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepository = $productRepository;
-		$this->eavSetup = $eavSetup;
+        $this->eavSetup = $eavSetup;
         $this->storeManager = $storeManager;
         $this->sourceItemFactory = $sourceItemFactory;
         $this->sourceItemsSaveInterface = $sourceItemsSaveInterface;
-		$this->categoryLink = $categoryLink;
+        $this->categoryLink = $categoryLink;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getDependencies(): array
+    {
+        return [];
     }
 
     /**
@@ -120,11 +128,11 @@ class CreateGripTrainerProduct implements DataPatchInterface
 
         $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
         $websiteIDs = [$this->storeManager->getStore()->getWebsiteId()];
-		$product->setTypeId(Type::TYPE_SIMPLE)
+        $product->setTypeId(Type::TYPE_SIMPLE)
             ->setWebsiteIds($websiteIDs)
             ->setAttributeSetId($attributeSetId)
             ->setName('Grip Trainer')
-			->setUrlKey('griptrainer')
+            ->setUrlKey('griptrainer')
             ->setSku('grip-trainer')
             ->setPrice(9.99)
             ->setVisibility(Visibility::VISIBILITY_BOTH)
@@ -142,15 +150,7 @@ class CreateGripTrainerProduct implements DataPatchInterface
 
         $this->sourceItemsSaveInterface->execute($this->sourceItems);
 
-		$this->categoryLink->assignProductToCategories($product->getSku(), [2]);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public static function getDependencies(): array
-    {
-        return [];
+        $this->categoryLink->assignProductToCategories($product->getSku(), [2]);
     }
 
     /**
